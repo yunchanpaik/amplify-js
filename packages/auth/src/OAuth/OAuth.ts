@@ -125,9 +125,12 @@ export default class OAuth {
 			.map(pairings => pairings.split('='))
 			.reduce((accum, [k, v]) => ({ ...accum, [k]: v }), { code: undefined });
 
-		const currentUrlPathname = parse(currentUrl).pathname || '/';
-		const redirectSignInPathname =
-			parse(this._config.redirectSignIn).pathname || '/';
+		const currentUrlPathname = this._removeTrailingSlash(
+			parse(currentUrl).pathname || '/'
+		);
+		const redirectSignInPathname = this._removeTrailingSlash(
+			parse(this._config.redirectSignIn).pathname || '/'
+		);
 
 		if (!code || currentUrlPathname !== redirectSignInPathname) {
 			return;
@@ -345,5 +348,10 @@ export default class OAuth {
 			state.push(CHARSET[index]);
 		}
 		return state.join('');
+	}
+
+	private _removeTrailingSlash(url: string) {
+		// remove trailing slash if it exists and url is not '/'
+		return url.replace(/\/$/, (match, offset) => (offset === 0 ? match : ''));
 	}
 }
